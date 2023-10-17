@@ -9,17 +9,27 @@ Page({
         listCommunity: [],
         listHandler: [],
     
+        HandlerComm: '',  // 预约社区（传入参数）
+
         HandlerDate: '',  // 预约日期
-        HandlerComm: '',  // 预约社区
+        HandlerTime: '',  // 预约日期
         HandlerUnit: '',  // 预约单位
+
         visitorTel: '',   // 联系电话
-        visitorNum: null    // 访客人数
+        visitorMan: '',   // 联系人
+        visitorNum: null,   // 联系电话
     },
   
       /**
        * 生命周期函数--监听页面加载
        */
       onLoad(options) {
+        // 接受传入参数
+        const HandlerComm = options.a ? options.a : 'A社区';
+        this.setData({
+            HandlerComm: HandlerComm
+        });
+
           wx.cloud.init({
               env:'yang7hi-5geaikfcf337ef0d' // 云开发环境id
           })
@@ -34,11 +44,20 @@ Page({
           
           wx.cloud.database().collection('HandlerInfo').get()
               .then(res => {
-                  console.log('请求到预约数据',res)
-                  this.setData({
-                      listHandler:res.data
-                  })
-              })
+                    console.log('请求到预约数据',res)
+                    this.setData({
+                        listHandler:res.data
+                    });
+                    
+                    // 选出所有 HandlerPass 为 true
+                    const filteredHandlers = res.data.filter(item => item.HandlerPass === true);
+                    // 筛选后的数组中获取 HandlerDate 和 HandlerTime
+                    const datesAndTimes = filteredHandlers.map(item => ({
+                        HandlerDate: item.HandlerDate,
+                        HandlerTime: item.HandlerTime
+                    }));
+                    console.log('已被预约的时间:', datesAndTimes);
+                })
       },
       
     //添加原始数据
@@ -69,7 +88,6 @@ Page({
             HandlerComm:'社区2',
             HandlerDate:'2023-10-18',
             HandlerUnit:'访客单位00',
-            visitorNum:"20",
             visitorTel:'00000380357'
         }
     })
@@ -156,12 +174,10 @@ Page({
         console.log('输入字段:', field);
         console.log('输入的值:', value);
         
-        // 使用index确保更新的是正确的listHandler项
         let updatedData = {};
         updatedData[field] = value;
         this.setData(updatedData);
     
-        // 同时更新其他页面数据（如果你的场景中只有一个预约的话，这样做是可以的）
         if (field === 'HandlerComm') {
             this.setData({ HandlerComm: value });
         } else if (field === 'HandlerDate') {
@@ -170,7 +186,11 @@ Page({
             this.setData({ HandlerUnit: value });
         } else if (field === 'visitorTel') {
             this.setData({ visitorTel: value });
-        } else if (field === 'visitorNum') {
+        } else if (field === 'HandlerTime') {
+            this.setData({ HandlerTime: value });
+        }else if (field === 'visitorMan') {
+            this.setData({ visitorMan: value });
+        }else if (field === 'visitorNum') {
             this.setData({ visitorNum: value });
         }
 
@@ -180,24 +200,27 @@ Page({
     
     submitFunction: function() {
         // 从页面的数据中获取必要的参数
-        const { HandlerComm, HandlerDate, HandlerUnit, visitorNum, visitorTel } = this.data;
+        const { HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum } = this.data;
     
         // 调用submit函数并传递参数
-        this.submit(HandlerComm, HandlerDate, HandlerUnit, visitorNum, visitorTel);
+        this.submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum);
     },
     
 
-    submit(HandlerComm, HandlerDate, HandlerUnit, visitorNum, visitorTel) {
-        console.log('字段0:', HandlerComm);
-        console.log('字段1:', HandlerDate);
+    submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum) {
         wx.cloud.database().collection('HandlerInfo')
             .add({
             data: {
                 HandlerComm: HandlerComm,
                 HandlerDate: HandlerDate,
+                HandlerTime: HandlerTime,
                 HandlerUnit: HandlerUnit,
+
+                visitorMan: visitorMan,
+                visitorTel: visitorTel,
                 visitorNum: visitorNum,
-                visitorTel: visitorTel
+
+                HandlerPass: false
             }
         })
         .then(res => {
@@ -208,8 +231,6 @@ Page({
         });
     },
       
-  
-    
     /**
      * 用户点击右上角分享
      */

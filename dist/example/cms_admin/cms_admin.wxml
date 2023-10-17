@@ -7,7 +7,7 @@
             <view class="item-row">社区联系人：<text class="item-content">{{item.CommMan}}</text></view>
             <view class="item-row">社区联系方式：<text class="item-content">{{item.CommTel}}</text></view>
             <view class="item-row">预约日期：<text class="item-content">{{item.CommDate}}</text></view>
-            <view class="item-row">剩余名额：<text class="item-content">{{item.CommResidue}}</text></view>
+            <view class="item-row">预约时间：<text class="item-content">{{item.CommTime}}</text></view>
         </view>
     </view>
 </view>

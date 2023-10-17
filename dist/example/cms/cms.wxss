@@ -73,4 +73,11 @@
     margin-left: 10px;  /* 添加左边距使得文本和输入框之间有一些间距 */
 }
 
+.divider {
+    height: 1px; 
+    background-color: #ddd; 
+    margin: 10px 0; 
+}
+
+
 
