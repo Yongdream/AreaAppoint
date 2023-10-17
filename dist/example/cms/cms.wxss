@@ -79,5 +79,15 @@
     margin: 10px 0; 
 }
 
+.notice-text {
+    padding: 10px;
+    font-size: 16px;
+    color: #666;
+    text-align: center;
+    background-color: #f7f7f7;
+    border-radius: 5px;
+}
+
+
 
 
