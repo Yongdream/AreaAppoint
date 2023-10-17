@@ -2,9 +2,15 @@
 
 <!-- 传入的社区参数 -->
 <view class="section">
-    <view class="section-title">预约社区</view>
+    <view class="section-title">社区信息</view>
     <view class="list-item">
         <view class="item-row">{{HandlerComm}}</view>
+    </view>
+    <view class="list-item">
+        <view class="item-row">{{currentCommMan}}</view>
+    </view>
+    <view class="list-item">
+            <view class="item-row">{{currentCommTel}}</view>
     </view>
 </view>
 

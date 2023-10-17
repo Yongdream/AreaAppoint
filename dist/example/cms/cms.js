@@ -11,6 +11,9 @@ Page({
     
         HandlerComm: '',  // 预约社区（传入参数）
 
+        currentCommMan: '', // 用于存储当前的CommMan
+        currentCommTel: '', // 用于存储当前的CommTel
+
         HandlerDate: '',  // 预约日期
         HandlerTime: '',  // 预约日期
         HandlerUnit: '',  // 预约单位
@@ -24,8 +27,8 @@ Page({
        * 生命周期函数--监听页面加载
        */
       onLoad(options) {
-        // 接受传入参数
-        const HandlerComm = options.a ? options.a : 'A社区';
+        // 接受传入社区参数
+        const HandlerComm = options.a ? options.a : '社区0';
         this.setData({
             HandlerComm: HandlerComm
         });
@@ -33,13 +36,24 @@ Page({
           wx.cloud.init({
               env:'yang7hi-5geaikfcf337ef0d' // 云开发环境id
           })
-  
-          wx.cloud.database().collection('CommunityInfo').get()
+
+          // 全部社区数据
+          wx.cloud.database().collection('CommunityInfo')
+              .where({
+                CommName: HandlerComm
+              })    
+              .get()
               .then(res => {
-                  console.log('请求到社区数据',res)
+                  console.log('请求到指定社区数据',res)
                   this.setData({
                       listCommunity:res.data
-                  })
+                  });
+                  if (res.data.length > 0) {
+                    this.setData({
+                        currentCommMan: res.data[0].CommMan,
+                        currentCommTel: res.data[0].CommTel,
+                    });
+                }
               })
           
           wx.cloud.database().collection('HandlerInfo').get()
@@ -49,9 +63,9 @@ Page({
                         listHandler:res.data
                     });
                     
-                    // 选出所有 HandlerPass 为 true
-                    const filteredHandlers = res.data.filter(item => item.HandlerPass === true);
-                    // 筛选后的数组中获取 HandlerDate 和 HandlerTime
+                    // 筛选被预约时段
+                    const currentComm = this.data.HandlerComm;
+                    const filteredHandlers = res.data.filter(item => item.HandlerPass === true && item.HandlerComm === currentComm);
                     const datesAndTimes = filteredHandlers.map(item => ({
                         HandlerDate: item.HandlerDate,
                         HandlerTime: item.HandlerTime
