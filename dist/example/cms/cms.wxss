@@ -1,0 +1,66 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background-color: #f6f6f6;
+}
+
+.section {
+    margin-bottom: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007aff;
+    padding: 8px 12px;
+}
+
+.list-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.item-row {
+    font-size: 14px;
+    color: #4a4a4a;
+    margin-bottom: 8px;
+}
+
+.item-content {
+    color: #777777;
+}
+
+.submit-button {
+    background-color: #007aff;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;  /* 添加适当的底部外边距 */
+}
+
+.flex-row {
+    display: flex;
+    align-items: center;  /* 保证内容垂直居中 */
+}
+
+.number-input {
+     width: 50px;   /* 或其他适当的宽度 */
+    border: 1px solid #e0e0e0;
+    padding: 5px;
+    border-radius: 4px;
+    text-align: center;
+    margin-left: 10px;  /* 添加左边距使得文本和输入框之间有一些间距 */
+}
+
+
