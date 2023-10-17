@@ -1,0 +1,39 @@
+/* example/cms/cms_admin.wxss */
+
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background-color: #f6f6f6;
+}
+
+.section {
+    margin-bottom: 15px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007aff;
+    padding: 8px 12px;
+}
+
+.list-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.item-row {
+    display: flex;                  /* 将 item-row 设为 flex 容器 */
+    align-items: center;            /* 垂直居中对齐子项 */
+    justify-content: flex-start;    /* 从左到右对齐子项 */
+    margin-bottom: 8px;
+}
+
+.item-content {
+    color: #777777;
+}

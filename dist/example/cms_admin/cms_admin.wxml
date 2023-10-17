@@ -1,0 +1,13 @@
+<view class="container">
+    <!-- 社区信息部分 -->
+    <view class="section">
+        <view class="section-title">社区信息</view>
+        <view wx:for="{{listCommunity}}" class="list-item">
+            <view class="item-row">社区名称：<text class="item-content">{{item.CommName}}</text></view>
+            <view class="item-row">社区联系人：<text class="item-content">{{item.CommMan}}</text></view>
+            <view class="item-row">社区联系方式：<text class="item-content">{{item.CommTel}}</text></view>
+            <view class="item-row">预约日期：<text class="item-content">{{item.CommDate}}</text></view>
+            <view class="item-row">剩余名额：<text class="item-content">{{item.CommResidue}}</text></view>
+        </view>
+    </view>
+</view>

@@ -9,11 +9,10 @@ Page({
         listCommunity: [],
         listHandler: [],
     
-        HandlerDate: '2023-12-18',  // 预约日期
-        HandlerComm: '',  // 预约社区
-        HandlerUnit: '',  // 预约单位
-        visitorTel: '',   // 联系电话
-        visitorNum: null    // 访客人数
+        listCommunity: [],
+        listHandler: [],
+        visitorNum: 0,
+        editedData: {}  // 用于暂存所有输入框的数据
     },
   
       /**
@@ -151,52 +150,12 @@ Page({
   
     handleInput: function(e) {
         const field = e.currentTarget.dataset.field;
-        const value = e.detail.value;
-        const index = e.currentTarget.dataset.index;
-    
-        console.log('输入字段:', field);
-        console.log('输入的值:', value);
-        console.log('当前列表项的索引:', index);
-        
-        // 使用index确保更新的是正确的listHandler项
-        let updatedItem = this.data.listHandler[index];
-        updatedItem[field] = value;
-    
-        console.log('更新后的项:', updatedItem);
         this.setData({
-            listHandler: [...this.data.listHandler.slice(0, index), updatedItem, ...this.data.listHandler.slice(index + 1)]
+            [field]: e.detail.value
         });
-        console.log('更新后的完整listHandler:', this.data.listHandler);
-
-        // 同时更新其他页面数据（如果你的场景中只有一个预约的话，这样做是可以的）
-        if (field === 'HandlerComm') {
-            this.setData({ HandlerComm: value });
-        } else if (field === 'HandlerDate') {
-            this.setData({ HandlerDate: value });
-        } else if (field === 'HandlerUnit') {
-            this.setData({ HandlerUnit: value });
-        } else if (field === 'visitorTel') {
-            this.setData({ visitorTel: value });
-        } else if (field === 'visitorNum') {
-            this.setData({ visitorNum: value });
-        }
-
-        console.log('更新后的完整listHandler:', this.data.listHandler);
     },
-    
-    
-    submitFunction: function() {
-        // 从页面的数据中获取必要的参数
-        const { HandlerComm, HandlerDate, HandlerUnit, visitorNum, visitorTel } = this.data;
-    
-        // 调用submit函数并传递参数
-        this.submit(HandlerComm, HandlerDate, HandlerUnit, visitorNum, visitorTel);
-    },
-    
 
     submit(HandlerComm, HandlerDate, HandlerUnit, visitorNum, visitorTel) {
-        console.log('字段0:', HandlerComm);
-        console.log('字段1:', HandlerDate);
         wx.cloud.database().collection('HandlerInfo')
             .add({
             data: {
@@ -210,13 +169,13 @@ Page({
         .then(res => {
             console.log('添加成功', res);
             // 清空已输入的数据，为下一次输入做准备
-            // this.setData({
-            //     HandlerComm: '',
-            //     HandlerDate: '',
-            //     HandlerUnit: '',
-            //     visitorNum: null,
-            //     visitorTel: ''
-            // });
+            this.setData({
+                HandlerComm: '',
+                HandlerDate: '',
+                HandlerUnit: '',
+                visitorNum: null,
+                visitorTel: ''
+            });
         })
         .catch(error => {
             console.error('添加失败', error);

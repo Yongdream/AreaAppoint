@@ -3,6 +3,9 @@
     "example/index",
 
     "example/cms/cms",
+    "example/cms/cms_user",
+    "example/cms_admin/cms_admin",
+
     "example/button/button",
     "example/button/button_default",
     "example/button/button_bottom_fixed",

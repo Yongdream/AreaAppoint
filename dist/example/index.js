@@ -5,8 +5,14 @@ Page({
     {
         id: 'cms',
         name: 'cms',
-        open: false,
+        open: true,
         pages: ['cms'],
+        },
+        {
+            id: 'cms',
+            name: 'cms',
+            open: true,
+            pages: ['cms_admin'],
         },
       {
         id: 'form',

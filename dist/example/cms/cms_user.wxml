@@ -1,0 +1,25 @@
+<view class="container">
+
+<!-- 预约信息部分 -->
+<view class="section">
+    <view class="section-title">预约信息</view>
+    <view wx:for="{{listHandler}}" class="list-item">
+        <view class="item-row">预约日期：<text class="item-content">{{item.HandlerDate}}</text></view>
+        <view class="item-row">预约社区：<text class="item-content">{{item.HandlerComm}}</text></view>
+        
+        <view class="item-row">预约单位
+            <input type="text" data-index="{{index}}" value="{{item.HandlerUnit}}" placeholder="输入预约单位" bindinput="handleInput" data-field="HandlerUnit" class="text-input" />
+        </view>
+        <view class="item-row">联系电话
+            <input type="tel" value="{{item.visitorTel}}" placeholder="输入联系人电话" bindinput="handleInput" data-field="visitorTel" class="number-input" />
+        </view>
+        <view class="item-row">访客人数
+            <input type="number" value="{{item.inputNum}}" placeholder="输入访客数量" bindinput="handleInput" data-field="visitorNum" class="number-input" />
+        </view>
+
+
+    </view>
+</view>
+
+<button class="submit-button" bindtap="submit">提交表单</button>
+</view>
