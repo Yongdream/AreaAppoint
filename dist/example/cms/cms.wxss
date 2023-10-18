@@ -88,6 +88,19 @@
     border-radius: 5px;
 }
 
+.upload-button {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.file-preview {
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+}
+
 
 
 

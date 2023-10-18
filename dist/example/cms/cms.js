@@ -10,7 +10,6 @@ Page({
         listHandler: [],
     
         HandlerComm: '',  // 预约社区（传入参数）
-
         currentCommMan: '', // 用于存储当前的CommMan
         currentCommTel: '', // 用于存储当前的CommTel
 
@@ -21,6 +20,8 @@ Page({
         visitorTel: '',   // 联系电话
         visitorMan: '',   // 联系人
         visitorNum: null,   // 联系电话
+
+        filteredHandlers: [],
     },
   
       /**
@@ -64,15 +65,92 @@ Page({
                     });
                     
                     // 筛选被预约时段
-                    const currentComm = this.data.HandlerComm;
-                    const filteredHandlers = res.data.filter(item => item.HandlerPass === true && item.HandlerComm === currentComm);
-                    const datesAndTimes = filteredHandlers.map(item => ({
-                        HandlerDate: item.HandlerDate,
-                        HandlerTime: item.HandlerTime
-                    }));
-                    console.log('已被预约的时间:', datesAndTimes);
-                })
-      },
+                    const filteredHandlers = this.getFilteredHandlers(res.data, this.data.HandlerComm);
+                    console.log('已成功预约:', filteredHandlers);
+                    // 统计 HandlerTime 的数量
+                    const countedTimes = this.countHandlerTimes(filteredHandlers);
+                    console.log('每个日期下的HandlerTime数量:', countedTimes);
+                    // 判断特定日期到后30天是否约满
+                    const selectedDate = '2023-10-18';      // 示例
+                    const fullyBookedDates = this.checkDatesFullyBooked(countedTimes, selectedDate);
+                    console.log('从', selectedDate, '开始的后30天中约满的日期:', fullyBookedDates);
+                });
+    },
+
+    // 根据当前社区获得预约信息
+    getFilteredHandlers: function(data, currentComm) {
+        return data.filter(item => item.HandlerPass === true && item.HandlerComm === currentComm);
+    },
+
+    // 统计每个日期被预约次数
+    countHandlerTimes: function(datesAndTimes) {
+        let result = {};
+
+        for (let item of datesAndTimes) {
+            if (result[item.HandlerDate]) {
+                result[item.HandlerDate] += 1;
+            } else {
+                result[item.HandlerDate] = 1;
+            }
+        }
+        return result;
+    },
+
+    // 判断日期起始日期后30天是否约满 输出约满的日期
+    checkDatesFullyBooked: function(countedTimes, startDate) {
+        let date = startDate;
+        const fullyBookedDates = [];
+
+        for (let i = 0; i < 30; i++) {
+            if (countedTimes[date] && countedTimes[date] >= 6) {
+                fullyBookedDates.push(date);
+            }
+            date = this.getNextDate(date);
+        }
+
+        return fullyBookedDates;
+    },
+
+    // 日期后30天
+    getNextDate: function(dateStr) {
+        const dt = new Date(dateStr);
+        dt.setDate(dt.getDate() + 1);
+        return dt.getFullYear() + "-" + ("0" + (dt.getMonth() + 1)).slice(-2) + "-" + ("0" + dt.getDate()).slice(-2);
+    },
+
+    onButtonClick: function() {
+        const specifiedDate = "2023-10-18";
+        const availableSlots = this.getAvailableTimeSlots(this.data.filteredHandlers, specifiedDate);
+        
+        // 输出或处理剩余的时间段
+        console.log('在', specifiedDate, '的剩余时间段编号为:', availableSlots);
+    
+        this.setData({
+            availableSlots: availableSlots
+        });
+    },    
+
+    getAvailableTimeSlots: function(filteredHandlers, date) {
+        const allSlots = {
+            "A": "9:00-10:00",
+            "B": "10:00-11:00",
+            "C": "11:00-12:00",
+            "D": "14:00-15:00",
+            "E": "16:00-17:00",
+            "F": "17:00-18:00"
+        };
+    
+        // 获取指定日期的所有已预约的时间段编号
+        const bookedSlotsForDate = filteredHandlers
+            .filter(item => listHandler.HandlerDate === date)
+            .map(item => listHandler.HandlerTime);
+
+        // 使用filter方法从所有时间段中过滤出不在bookedSlotsForDate中的那些
+        const availableSlotKeys = Object.keys(allSlots).filter(slotKey => !bookedSlotsForDate.includes(slotKey));
+        
+        return availableSlotKeys.join('');  // 例如，返回 "AF"
+    },
+
       
     //添加原始数据
     submit_origin(){
@@ -211,32 +289,55 @@ Page({
         console.log('更新后的完整listHandler:', this.data.listHandler);
     },
     
-    
     submitFunction: function() {
+        // 如果用户选择了文件，首先上传文件
+        if (this.data.selectedFilePath) {
+            const filePath = this.data.selectedFilePath;
+            const cloudPath = 'HandlerFile/' + new Date().getTime() + filePath.match(/\.([^.]+)$/)[1];
+            
+            wx.cloud.uploadFile({
+                cloudPath: cloudPath,
+                filePath: filePath,
+                success: res => {
+                    console.log('文件上传成功:', res.fileID);
+                    this.setData({
+                        selectedFileID: res.fileID
+                    });
+                    this.submitFormData();
+                },
+                fail: e => {
+                    console.error('文件上传失败:', e);
+                }
+            })
+        } else {
+            // 如果用户没有选择文件，直接提交表单
+            this.submitFormData();
+        }
+    },
+
+    submitFormData: function() {
         // 从页面的数据中获取必要的参数
-        const { HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum } = this.data;
+        const { HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum, selectedFileID  } = this.data;
     
         // 调用submit函数并传递参数
-        this.submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum);
+        this.submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum, selectedFileID);
     },
-    
 
-    submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum) {
-        wx.cloud.database().collection('HandlerInfo')
-            .add({
-            data: {
-                HandlerComm: HandlerComm,
-                HandlerDate: HandlerDate,
-                HandlerTime: HandlerTime,
-                HandlerUnit: HandlerUnit,
+    // 提交表单
+    submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum, fileID) {
+        const data = {
+            HandlerComm: HandlerComm,
+            HandlerDate: HandlerDate,
+            HandlerTime: HandlerTime,
+            HandlerUnit: HandlerUnit,
+            visitorMan: visitorMan,
+            visitorTel: visitorTel,
+            visitorNum: visitorNum,
+            HandlerPass: false
+        };
+        if (fileID) data.HandlerFileID = fileID;
 
-                visitorMan: visitorMan,
-                visitorTel: visitorTel,
-                visitorNum: visitorNum,
-
-                HandlerPass: false
-            }
-        })
+        wx.cloud.database().collection('HandlerInfo').add({ data })
         .then(res => {
             console.log('添加成功', res);
         })
@@ -244,6 +345,58 @@ Page({
             console.error('添加失败', error);
         });
     },
+
+    
+
+    chooseFile: function () {
+        const that = this
+        wx.showActionSheet({
+          itemList: ['拍照', '相册'],
+          itemColor: '',
+          //成功时回调
+          success: function (res) {
+            if (!res.cancel) {
+              /*
+               res.tapIndex返回用户点击的按钮序号，从上到下的顺序，从0开始
+               比如用户点击本例中的拍照就返回0，相册就返回1
+               我们res.tapIndex的值传给chooseImage()
+              */
+              that.chooseImage(res.tapIndex)
+            }
+          },
+          //失败时回调
+          fail: function (res) {
+            console.log('调用失败')
+           },
+          complete: function (res) { },
+        })
+      },
+
+      chooseImage(tapIndex) {
+        const checkeddata = true
+        const that = this
+        wx.chooseImage({
+        //count表示一次可以选择多少照片
+          count: 1,
+          //sizeType所选的图片的尺寸，original原图，compressed压缩图
+          sizeType: ['original', 'compressed'],
+          //如果sourceType为camera则调用摄像头，为album时调用相册
+          sourceType: [that.data.sourceType[tapIndex]],
+          success(res) {
+            // tempFilePath可以作为img标签的src属性显示图片
+            const tempFilePaths = res.tempFilePaths
+            //将选择到的图片缓存到本地storage中
+            wx.setStorageSync('tempFilePaths', tempFilePaths)
+            that.setHeader();
+            wx.showToast({
+              title: '设置成功',
+              icon: 'success',
+              duration: 2000
+            })
+          }
+        })
+      },
+    
       
     /**
      * 用户点击右上角分享
@@ -251,4 +404,5 @@ Page({
     onShareAppMessage() {
   
     }
-  })
+  });
+

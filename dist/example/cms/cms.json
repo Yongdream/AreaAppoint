@@ -1,3 +1,6 @@
 {
-  "usingComponents": {}
+  "usingComponents": {},
+  "scope.writePhotosAlbum": {
+    "desc": "请求访问你的相册"
+  }
 }

@@ -38,8 +38,18 @@
         <view class="item-row">访客人数
             <input type="tel" value="{{visitorNum}}" placeholder="" bindinput="handleInput" data-field="visitorNum" class="text-input" />
         </view>
+        <view class="list-item">
+
+        <picker mode="file" bindchange="chooseFile">
+            <view class="upload-button">选择文件</view>
+        </picker>
+        <!-- 如果有选定的文件，显示预览 -->
+        <image wx:if="{{selectedFilePath}}" src="{{selectedFilePath}}" class="file-preview" />
+    </view>
     </view>
 </view>
+
+<button bindtap="onButtonClick">点击我查看剩余时间段</button>
 
 <button class="submit-button" bindtap="submitFunction">提交表单</button>
 <view class="container">
