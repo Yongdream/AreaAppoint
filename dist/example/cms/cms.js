@@ -12,16 +12,21 @@ Page({
         HandlerComm: '',  // 预约社区（传入参数）
         currentCommMan: '', // 用于存储当前的CommMan
         currentCommTel: '', // 用于存储当前的CommTel
-
         HandlerDate: '',  // 预约日期
         HandlerTime: '',  // 预约日期
         HandlerUnit: '',  // 预约单位
-
         visitorTel: '',   // 联系电话
         visitorMan: '',   // 联系人
         visitorNum: null,   // 联系电话
-
         filteredHandlers: [],
+        timeSlots: {
+            "A": "9:00-10:00",
+            "B": "10:00-11:00",
+            "C": "11:00-12:00",
+            "D": "14:00-15:00",
+            "E": "16:00-17:00",
+            "F": "17:00-18:00"
+        },
     },
   
       /**
@@ -64,20 +69,24 @@ Page({
                         listHandler:res.data
                     });
                     
-                    // 筛选被预约时段
+                    // 筛选成功预约时段
                     const filteredHandlers = this.getFilteredHandlers(res.data, this.data.HandlerComm);
-                    console.log('已成功预约:', filteredHandlers);
-                    // 统计 HandlerTime 的数量
+                    console.log('已成功预约时段:', filteredHandlers);
+                    // 统计每个日期预约数量
                     const countedTimes = this.countHandlerTimes(filteredHandlers);
                     console.log('每个日期下的HandlerTime数量:', countedTimes);
-                    // 判断特定日期到后30天是否约满
+
+                    // 判断 特定日期 后4个月是否约满
                     const selectedDate = '2023-10-18';      // 示例
                     const fullyBookedDates = this.checkDatesFullyBooked(countedTimes, selectedDate);
-                    console.log('从', selectedDate, '开始的后30天中约满的日期:', fullyBookedDates);
+                    console.log('从', selectedDate, '开始的后4个月中约满的日期:', fullyBookedDates);
+
+                    const availableSlots = this.getAvailableTimeSlotsForGivenDate(filteredHandlers, selectedDate);
+                    console.log('在', selectedDate, '的剩余时间段编号为:', availableSlots); // 输出剩余的时间段编码
                 });
     },
 
-    // 根据当前社区获得预约信息
+    // 当前社区全部预约信息
     getFilteredHandlers: function(data, currentComm) {
         return data.filter(item => item.HandlerPass === true && item.HandlerComm === currentComm);
     },
@@ -96,59 +105,52 @@ Page({
         return result;
     },
 
-    // 判断日期起始日期后30天是否约满 输出约满的日期
+    // 判断日期起始日期后4个月是否约满 输出约满的日期
     checkDatesFullyBooked: function(countedTimes, startDate) {
         let date = startDate;
         const fullyBookedDates = [];
+        const endDate = this.getNextDateAfterFourMonths(startDate);  // 计算4个月后的日期
 
-        for (let i = 0; i < 30; i++) {
+        while (date !== endDate) {
             if (countedTimes[date] && countedTimes[date] >= 6) {
                 fullyBookedDates.push(date);
             }
-            date = this.getNextDate(date);
+            date = this.getNextDate(date);  // 将日期加一天
         }
 
         return fullyBookedDates;
     },
 
-    // 日期后30天
+
+    // 日期后一天
     getNextDate: function(dateStr) {
         const dt = new Date(dateStr);
         dt.setDate(dt.getDate() + 1);
-        return dt.getFullYear() + "-" + ("0" + (dt.getMonth() + 1)).slice(-2) + "-" + ("0" + dt.getDate()).slice(-2);
+        const newday = dt.getFullYear() + "-" + ("0" + (dt.getMonth() + 1)).slice(-2) + "-" + ("0" + dt.getDate()).slice(-2);
+        return newday;
     },
 
-    onButtonClick: function() {
-        const specifiedDate = "2023-10-18";
-        const availableSlots = this.getAvailableTimeSlots(this.data.filteredHandlers, specifiedDate);
-        
-        // 输出或处理剩余的时间段
-        console.log('在', specifiedDate, '的剩余时间段编号为:', availableSlots);
-    
-        this.setData({
-            availableSlots: availableSlots
-        });
-    },    
 
-    getAvailableTimeSlots: function(filteredHandlers, date) {
-        const allSlots = {
-            "A": "9:00-10:00",
-            "B": "10:00-11:00",
-            "C": "11:00-12:00",
-            "D": "14:00-15:00",
-            "E": "16:00-17:00",
-            "F": "17:00-18:00"
-        };
-    
-        // 获取指定日期的所有已预约的时间段编号
+    // 日期后4个月
+    getNextDateAfterFourMonths: function(dateStr) {
+        const dt = new Date(dateStr);
+        dt.setMonth(dt.getMonth() + 4);
+        const newDate = dt.getFullYear() + "-" + ("0" + (dt.getMonth() + 1)).slice(-2) + "-" + ("0" + dt.getDate()).slice(-2);
+        console.log("New date after 4 months:", newDate);
+        return newDate;
+    },
+
+
+    // 获取指定日期的剩余时间段编码
+    getAvailableTimeSlotsForGivenDate: function(filteredHandlers, date) {
+        const allSlots = this.data.timeSlots;
         const bookedSlotsForDate = filteredHandlers
-            .filter(item => listHandler.HandlerDate === date)
-            .map(item => listHandler.HandlerTime);
+            .filter(item => item.HandlerDate === date)
+            .map(item => item.HandlerTime);
 
-        // 使用filter方法从所有时间段中过滤出不在bookedSlotsForDate中的那些
-        const availableSlotKeys = Object.keys(allSlots).filter(slotKey => !bookedSlotsForDate.includes(slotKey));
-        
-        return availableSlotKeys.join('');  // 例如，返回 "AF"
+        // console.log('bookedSlotsForDate:', bookedSlotsForDate);
+        const availableSlotKeys = Object.keys(allSlots).filter(slotKey => !bookedSlotsForDate.includes(allSlots[slotKey]));
+        return availableSlotKeys; 
     },
 
       
@@ -405,4 +407,6 @@ Page({
   
     }
   });
+
+
 

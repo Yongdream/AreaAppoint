@@ -49,8 +49,6 @@
     </view>
 </view>
 
-<button bindtap="onButtonClick">点击我查看剩余时间段</button>
-
 <button class="submit-button" bindtap="submitFunction">提交表单</button>
 <view class="container">
     <!-- 审核通知部分 -->
