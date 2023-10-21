@@ -38,6 +38,16 @@
         <view class="item-row">访客人数
             <input type="tel" value="{{visitorNum}}" placeholder="" bindinput="handleInput" data-field="visitorNum" class="text-input" />
         </view>
+        <view class="item-row">
+            <checkbox checked="{{HandlerLesson}}" bindtap="handleCheckboxChange" data-field="HandlerLesson" /> 是否需要微党课
+        </view>
+
+        <view class="item-row">
+            <checkbox checked="{{HandlerDine}}" bindtap="handleCheckboxChange" data-field="HandlerDine" /> 是否需要就餐
+        </view>
+
+        <button bindtap="previewImage">点击预览图片</button>
+
         <view class="list-item">
 
         <picker mode="file" bindchange="chooseFile">

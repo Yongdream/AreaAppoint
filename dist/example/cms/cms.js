@@ -15,6 +15,9 @@ Page({
         HandlerDate: '',  // 预约日期
         HandlerTime: '',  // 预约日期
         HandlerUnit: '',  // 预约单位
+        HandlerLesson: false, // 是否需要微党课
+        HandlerDine: false, // 是否需要就餐
+        
         visitorTel: '',   // 联系电话
         visitorMan: '',   // 联系人
         visitorNum: null,   // 联系电话
@@ -290,6 +293,19 @@ Page({
 
         console.log('更新后的完整listHandler:', this.data.listHandler);
     },
+
+    handleCheckboxChange: function(e) {
+        const field = e.currentTarget.dataset.field;
+        // 直接取当前状态的反来判断复选框是否被选中
+        const isChecked = !this.data[field];
+        console.log('isChecked:', isChecked);
+    
+        let updatedData = {};
+        updatedData[field] = isChecked;
+        this.setData(updatedData);
+        console.log('updatedData:', updatedData);
+    },
+    
     
     submitFunction: function() {
         // 如果用户选择了文件，首先上传文件
@@ -319,19 +335,22 @@ Page({
 
     submitFormData: function() {
         // 从页面的数据中获取必要的参数
-        const { HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum, selectedFileID  } = this.data;
+        const { HandlerComm, HandlerDate, HandlerTime, HandlerUnit, HandlerLesson, HandlerDine, visitorMan, visitorTel, visitorNum, selectedFileID  } = this.data;
     
         // 调用submit函数并传递参数
-        this.submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum, selectedFileID);
+        this.submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, HandlerLesson, HandlerDine, visitorMan, visitorTel, visitorNum, selectedFileID);
     },
 
     // 提交表单
-    submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, visitorMan, visitorTel, visitorNum, fileID) {
+    submit(HandlerComm, HandlerDate, HandlerTime, HandlerUnit, HandlerLesson, HandlerDine, visitorMan, visitorTel, visitorNum, fileID) {
         const data = {
             HandlerComm: HandlerComm,
             HandlerDate: HandlerDate,
             HandlerTime: HandlerTime,
             HandlerUnit: HandlerUnit,
+            HandlerLesson: HandlerLesson,
+            HandlerDine: HandlerDine,
+
             visitorMan: visitorMan,
             visitorTel: visitorTel,
             visitorNum: visitorNum,
@@ -348,7 +367,11 @@ Page({
         });
     },
 
-    
+    previewImage: function() {
+        wx.previewImage({
+            urls: ['cloud://yang7hi-5geaikfcf337ef0d.7961-yang7hi-5geaikfcf337ef0d-1309139202/cloudbase-cms/upload/2023-10-21/6cc92ddxvo6r7v82o0rqbn812k3yv7e0_.png']
+        });
+    },
 
     chooseFile: function () {
         const that = this

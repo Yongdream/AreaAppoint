@@ -2,5 +2,10 @@
   "usingComponents": {},
   "scope.writePhotosAlbum": {
     "desc": "请求访问你的相册"
-  }
+  },
+
+    "web-view": {
+    "business-domain-name": ["cloud://yang7hi-5geaikfcf337ef0d.7961-yang7hi-5geaikfcf337ef0d-1309139202/cloudbase-cms/upload/2023-10-21/73whnhghtt5x9a51ll1nipm1x9txwi4j_.png"]
+    }
+  
 }
